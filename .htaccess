@@ -1,0 +1,35 @@
+# 源码市集 - Apache 配置（可选，Nginx 用户自行映射）
+
+# 禁止访问敏感目录
+RewriteEngine On
+RewriteRule ^(data|includes)/ - [F,L]
+
+# 入口统一（可选，让所有请求走 index.php 做路由；本项目已用直接 .php 入口，下面保持默认即可）
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^.*$ /index.php [L]
+
+# 默认文档
+DirectoryIndex index.php install.php
+
+# 安全头
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# 禁止直接下载 config.php / includes/
+<FilesMatch "^(config\.php|\.htaccess|\.installed)$">
+  Require all denied
+</FilesMatch>
+
+# 静态资源缓存
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+</IfModule>
